@@ -158,11 +158,11 @@ document.getElementById("mtotal").textContent=usd(total);
 document.getElementById("tfix").textContent=usd(fx);
 document.getElementById("tcos").textContent=usd(cs);
 const done=[
- {k:"fix",h:"Fix / functional",items:[["New Carrier HVAC system",4000],["New garage door",5000],["New front door",2000],["Toilet leak above the breaker panel",0],["Kitchen sink, faucet and P-trap",600],["Rocking toilet shimmed",0],["Three-way switch rewiring",0],["Light fixtures",400],["New toilet and bathroom plumbing fixtures",750],["Garage electrical",1500]]},
+ {k:"fix",h:"Fix / functional",items:[["New Carrier HVAC system",4000],["New garage door",5000],["New front door",2000],["Kitchen sink, faucet and P-trap",600],["Light fixtures",400],["New toilet and bathroom plumbing fixtures",750],["Garage electrical",1500]]},
  {k:"cos",h:"Cosmetic",items:[["Carpet",9000],["Interior painting (pro)",3500],["Over-the-range microwave",350],["Stairs refinished",500]]},
  {k:"fur",h:"Furnishings",items:[["Couch",7000]]},
- {k:"tool",h:"Tools and supplies",items:[["Misc tools and supplies",4000]]}];
-const dsum=g=>g.items.reduce((a,i)=>a+i[1],0);
+ {k:"tool",h:"Misc DIY fixes, tools and supplies",t:4000,items:[["Toilet leak above the breaker panel",0],["Rocking toilet shimmed",0],["Three-way switch rewiring",0],["New outlets throughout the house",0],["Tools and supplies for these jobs",0]]}];
+const dsum=g=>g.t??g.items.reduce((a,i)=>a+i[1],0);
 const spent=done.reduce((a,g)=>a+dsum(g),0);
 document.getElementById("donecols").innerHTML=done.map(g=>`<div><h4 class="${g.k}h"><span>${esc(g.h)}</span><span>${usd(dsum(g))}</span></h4><ul class="donelist">${g.items.map(i=>`<li><span>${esc(i[0])}</span><span>${i[1]?usd(i[1]):""}</span></li>`).join("")}</ul></div>`).join("");
 document.getElementById("dtot").textContent=usd(spent);
