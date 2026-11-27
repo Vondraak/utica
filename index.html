@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>House project list</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: plain, practical job-site punch list for one owner
+   IDEA: a contractor's punch list clipped to a board in the garage
+   PICTURE: the checklist itself, grouped by area, with live progress
+   COLOUR and TYPE: dark slate ground, siding red-brown, slate green, oak, green/grey money bar; Barlow Condensed + Barlow
+   LAYOUT: modest title, progress bar, filter row, two category columns stacking on phones */
+:root{color-scheme:dark;
+ --bg:#070808;--card:#111312;--ink:#e9ece9;
+ --muted:#9aa49f;--line:#242827;
+ --fix:#e0846f;--fixbg:#22140f;
+ --cos:#8fb3a8;--cosbg:#0f1b18;
+ --oak:#d6a75e;--go:#3fae5f;--stop:#3a3f3d}
+:root[data-theme]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px);max-width:1240px;margin:0 auto}
+h1{font:700 clamp(32px,5vw,48px)/1.05 "Barlow Condensed",sans-serif;margin:0 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 20px;max-width:70ch}
+.prog{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--oak);transition:width .4s}
+.count{font:600 18px "Barlow Condensed",sans-serif;white-space:nowrap}
+.money{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.mtop{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:10px}
+.big{font:700 clamp(30px,5vw,44px)/1 "Barlow Condensed",sans-serif;color:var(--oak);white-space:nowrap}
+.mof{font:600 20px "Barlow Condensed",sans-serif;color:var(--muted)}
+.mbar{height:18px;border-radius:9px;margin-bottom:10px;background:var(--stop)}.mbar i{background:var(--go)}
+.big{color:var(--go)!important}
+.sw.g{background:var(--go)}.sw.r{background:var(--stop)}
+.mnote{color:var(--muted);font-size:14px;margin:6px 0 0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}.sw.f{background:var(--fix)}.sw.c2{background:var(--cos)}
+.prog{gap:20px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.filters button{font:500 16px Barlow,sans-serif;min-height:44px;padding:8px 16px;border-radius:22px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--oak);outline-offset:2px}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.cat h2{font:700 28px/1.1 "Barlow Condensed",sans-serif;margin:0 0 4px;display:flex;justify-content:space-between;gap:10px}
+.cat>p{color:var(--muted);margin:0 0 14px;font-size:15px}
+.cat.fix h2{color:var(--fix)}.cat.cos h2{color:var(--cos)}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.grp h3{font:600 20px "Barlow Condensed",sans-serif;margin:0;padding:10px 16px}
+.fix .grp h3{background:var(--fixbg)}.cos .grp h3{background:var(--cosbg)}
+ul{list-style:none;margin:0;padding:4px 0}
+.item{padding:10px 16px}
+li+li .item{border-top:1px solid var(--line)}
+.t{font-weight:600}.n{display:block;color:var(--muted);font-size:15px}
+.c{display:inline-block;font-size:13px;font-weight:600;color:var(--oak);white-space:nowrap;margin-left:6px}
+.hide{display:none}
+.done h3{display:flex;justify-content:space-between;gap:10px;background:var(--line)}
+.dcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;padding:4px 16px 12px}
+.dcols h4{font:600 18px "Barlow Condensed",sans-serif;margin:10px 0 2px;display:flex;justify-content:space-between}
+.dcols .fixh{color:var(--fix)}.dcols .cosh{color:var(--cos)}.dcols .furh{color:var(--oak)}.dcols .toolh{color:var(--muted)}
+@media(max-width:760px){.dcols{grid-template-columns:minmax(0,1fr)}}
+.donelist{padding:0}
+.donelist li{padding:6px 0 6px 26px;position:relative;display:flex;justify-content:space-between;gap:10px}.donelist li span:last-child{white-space:nowrap;font-weight:600}
+.donelist li::before{content:"";position:absolute;left:4px;top:13px;width:10px;height:6px;border:solid var(--cos);border-width:0 0 2px 2px;transform:rotate(-45deg)}
+.foot{color:var(--muted);font-size:14px;margin-top:8px}
+@media(max-width:760px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="band">
+<h1>10647 Utica Road project list</h1>
+<p class="sub">Everything discussed so far, split into what needs fixing for the house to work right versus what makes it look and feel better. Costs are rough midpoints of each estimate.</p>
+<div class="money"><div class="mtop"><span class="big" id="mspent"></span><span class="mof" id="mof"></span></div>
+<div class="bar mbar" aria-hidden="true"><i id="mfill"></i></div>
+<div class="prog"><span class="count"><span class="sw g"></span>Spent</span><span class="count"><span class="sw r"></span>Still to do: <span id="mtotal"></span></span><span class="count"><span class="sw f"></span>Fix <span id="tfix"></span></span><span class="count"><span class="sw c2"></span>Cosmetic <span id="tcos"></span></span></div>
+<p class="mnote">Spent figures are actual costs. Still-to-do figures use the middle of each estimate. Items without a cost, and if-needed items like radon mitigation or an exclusion company, aren't counted.</p></div>
+<div class="filters" role="group" aria-label="Filter">
+<button data-f="all" aria-pressed="true">All</button>
+<button data-f="fix" aria-pressed="false">Fix / functional</button>
+<button data-f="cos" aria-pressed="false">Cosmetic</button>
+</div>
+<div class="cols" id="cols"></div>
+
+<section class="grp done" style="margin-top:28px">
+<h3>Already done <span class="cc" id="dtot"></span></h3>
+<div class="dcols" id="donecols"></div>
+</section>
+<p class="foot">Costs are rough ranges from earlier research, not quotes. Dropped: hidden bookcase door, WLED stair lighting.</p>
+</div>
+<script>
+{
+const data=[
+{cat:"fix",title:"Fix / functional",blurb:"Safety, water, pests, structure and systems. Do these first.",groups:[
+ {name:"Safety checks",items:[
+  ["Radon test","Lower-level family room, 2 to 4 days, windows closed. Mitigate at 4 pCi/L or higher.","$15 test; $1.5k to $2.5k fix",15],
+  ["CO detector in utility room","Next to the furnace and water heater.","~$25",25],
+  ["Water heater vent check","See where the aluminum vent goes; incense draft test at the draft hood. Liner if it is orphaned in the chimney.",""],
+  ["Asbestos test before any demo","Glue-up ceiling tiles and any old floor tile.","$30 to $50 a sample",80]]},
+ {name:"Mice and sealing",items:[
+  ["Set snap traps","Utility room and garage, along the walls. Keep a few out year-round.","~$15",15],
+  ["Seal the rim joist","Copper mesh plus Pestblock foam around the whole lower-level perimeter.",""],
+  ["Seal exterior gaps","Siding-to-block gap, AC line set, coax hole (silicone glob), garage jamb at slab, underside of the bump-out.",""],
+  ["Check garage corner droppings","Dark specks on the concrete below the garage corner.",""],
+  ["Egress window well","Clean out the leaves, add a cover that still opens from inside.",""],
+  ["Exclusion company if traps keep hitting","After 2 to 3 weeks of catches.","$800 to $2k (if needed)",0]]},
+ {name:"Roof and attic",items:[
+  ["Open the attic hatch and inspect","Stains, soft decking, droppings, vermiculite. Explains the bowing seen by drone.",""],
+  ["Roof quotes this winter, install in spring","Get a per-sheet decking price in writing; screen gable and soffit vents.","Materials ~$4.2k to $5.2k",4700],
+  ["Blow-in attic insulation","Air seal first, baffles at soffits, target R-49 to R-60, insulate the hatch. Check Xcel and CenterPoint rebates.","A few hundred DIY",400]]},
+ {name:"Exterior",items:[
+  ["Seal concrete gap by the garage","Sikaflex self-leveling plus backer rod. Needs 40°F or warmer.","~$40",40],
+  ["Patch rotted siding spots","By the deck step and window well, garage jamb, garage corner, behind the rain barrel.",""],
+  ["Gutters and downspouts","Check the gutter above the egress window; move rain barrel splash off the siding.",""],
+  ["Replace siding with steel","About 2,000 sq ft of vertical siding. Ask for rodent screen at the bottom and an RRP lead-certified crew. Bundle with the roof.","$20k to $32k installed",26000]]},
+ {name:"Plumbing and basement",items:[
+  ["Sewer line camera inspection","Old clay or cast iron line; roots or cracks.","$200 to $300",250],
+  ["Inspect cast iron drains","Rust or flaking on exposed pipe in the utility room.",""],
+  ["Check water heater age and condition","",""],
+  ["Egress window ceiling stain","Moisture meter and pencil outline; recheck after rain.",""]]},
+ {name:"Stairs and garage",items:[
+  ["Banister on the open side of the stairs","Prefinished black or cable, up the open side and along the landing. A safety item.",""],
+  ["Garage electrical","Outlets and lighting for the workbench; dedicated circuit if running tools.",""],
+  ["Built-in garage workbench","",""]]}
+]},
+{cat:"cos",title:"Cosmetic",blurb:"Looks and comfort. Do these as time and money allow.",groups:[
+ {name:"Stairs",items:[
+  ["Gel stain the light edge strip","Varathane Black, wipe off, dry 24 hours.",""],
+  ["Finish poly coats","Light 320 scuff between coats; one pass, no back-brushing.",""],
+  ["Remaining treads","Water test for old finish, scrape the skirt edge, SealCoat over the stain before poly.",""]]},
+ {name:"Rooms",items:[
+  ["Master bathroom remodel","Budgeted at $8,000. Asbestos test old tile before demo.","~$8,000",8000],
+  ["Convert basement ceiling to a drop ceiling","DIY, materials only, for about 500 to 580 sq ft: suspended grid, 2x2 or 2x4 tiles, hanger wire and lag eyes. Asbestos test the old glue-up tiles first; the grid can often hang below them. Drop-in LED panels add $40 to $60 each.","$900 to $1,800",1350],
+  ["Basement carpet","","~$2,000",2000]]},
+ {name:"Kitchen remodel",items:[
+  ["PVC / rigid core vinyl flooring, kitchen and dining as one floor","About 230 to 260 sq ft plus 10% waste. Rigid core (SPC) plank at $2 to $4 per sq ft, plus transitions and quarter round. DIY.","$700 to $1,400",1050],
+  ["Cabinets","About 15 to 20 linear ft for an 11x11 kitchen. Stock cabinets at the low end, semi-custom at the high end. Countertops are separate.","$2,500 to $8,000",5250],
+  ["Appliances: fridge, dishwasher, range","Fridge $1,000 to $2,500, dishwasher $500 to $1,000, range $700 to $1,500.","$2,200 to $5,000",3600]]},
+ {name:"Garage and entry",items:[
+  ["Paint the garage","Walls and ceiling, about 850 sq ft. Masonry waterproofing primer on the block walls (Drylok or Kilz masonry, about 5 to 6 gal), regular primer on the ceiling, 2 finish coats, plus rollers and tape.","$400 to $700 DIY",550],
+  ["Clean and seal the slate entry","pH-neutral cleaner, then a color-enhancing sealer.","$60 to $100",80]]},
+ {name:"Yard",items:[
+  ["DIY stone firepit","Block or stone firepit kit, steel fire ring insert, gravel and paver base.","$350 to $750",550],
+  ["New yard light","","~$250",250]]}
+]}];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cols=document.getElementById("cols");
+cols.innerHTML=data.map(c=>`<section class="cat ${c.cat}" data-cat="${c.cat}"><h2><span>${esc(c.title)}</span><span class="cc" data-cc="${c.cat}"></span></h2><p>${esc(c.blurb)}</p>${c.groups.map((g,gi)=>`<div class="grp"><h3>${esc(g.name)}</h3><ul>${g.items.map((it,ii)=>{const id=`${c.cat}-${gi}-${ii}`;return `<li data-id="${id}"><div class="item"><span class="t">${esc(it[0])}</span>${it[2]?`<span class="c">${esc(it[2])}</span>`:""}${it[1]?`<span class="n">${esc(it[1])}</span>`:""}</div></li>`}).join("")}</ul></div>`).join("")}</section>`).join("");
+const sum=k=>data.filter(c=>!k||c.cat===k).reduce((a,c)=>a+c.groups.reduce((b,g)=>b+g.items.reduce((x,it)=>x+(it[3]||0),0),0),0);
+const usd=n=>"$"+Math.round(n).toLocaleString("en-US");
+const total=sum(),fx=sum("fix"),cs=sum("cos");
+document.getElementById("mtotal").textContent=usd(total);
+document.getElementById("tfix").textContent=usd(fx);
+document.getElementById("tcos").textContent=usd(cs);
+const done=[
+ {k:"fix",h:"Fix / functional",items:[["New Carrier HVAC system",4000],["New garage door",5000],["New front door",2000],["Toilet leak above the breaker panel",0],["Kitchen sink, faucet and P-trap",600],["Rocking toilet shimmed",0],["Three-way switch rewiring",0],["Two ceiling light fixtures",0]]},
+ {k:"cos",h:"Cosmetic",items:[["Carpet",9000],["Interior painting (pro)",3500],["Over-the-range microwave",350],["Stairs sanded, stained, poly",0]]},
+ {k:"fur",h:"Furnishings",items:[["Couch",7000]]},
+ {k:"tool",h:"Tools and supplies",items:[["Misc tools and supplies",4000]]}];
+const dsum=g=>g.items.reduce((a,i)=>a+i[1],0);
+const spent=done.reduce((a,g)=>a+dsum(g),0);
+document.getElementById("donecols").innerHTML=done.map(g=>`<div><h4 class="${g.k}h"><span>${esc(g.h)}</span><span>${usd(dsum(g))}</span></h4><ul class="donelist">${g.items.map(i=>`<li><span>${esc(i[0])}</span><span>${i[1]?usd(i[1]):""}</span></li>`).join("")}</ul></div>`).join("");
+document.getElementById("dtot").textContent=usd(spent);
+document.getElementById("mspent").textContent=usd(spent)+" spent";
+document.getElementById("mof").textContent="of about "+usd(spent+total)+" total ("+Math.round(spent/(spent+total)*100)+"%)";
+document.getElementById("mfill").style.width=(spent/(spent+total)*100)+"%";
+document.querySelectorAll("[data-cc]").forEach(el=>{el.textContent=usd(sum(el.dataset.cc))});
+let filter="all";
+function update(){document.querySelectorAll(".cat").forEach(s=>s.classList.toggle("hide",filter!=="all"&&s.dataset.cat!==filter))}
+document.querySelectorAll(".filters button").forEach(btn=>btn.addEventListener("click",()=>{filter=btn.dataset.f;document.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===btn));update()}));
+update();
+}
+</script>
+</body>
+</html>
